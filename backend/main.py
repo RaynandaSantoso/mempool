@@ -19,6 +19,53 @@ def health():
 def get_mempool():
     return rpc("getmempoolinfo")
 
+@app.get("/api/mempool/stats")
+def get_mempool_stats():
+    pass
+
+@app.get("/api/tx/{txid}")
+def get_transaction(txid: str, blockhash: str = None):
+    node_info = rpc("getblockchaininfo")
+    is_pruned = node_info["pruned"]
+    prune_height = node_info.get("pruneheight", None)
+
+    # Step 1: Check mempool
+    try:
+        result = rpc("getmempoolentry", [txid])
+        return {"source": "mempool", "data": result}
+    except Exception as e:
+        error_code, error_message = e.args
+        # error code 5 means Transaction not in mempool
+        if error_code == -5: 
+            print(f"[DEBUG] no transaction in mempool with the id {txid}")
+        else:
+            return {"error": error_message}
+
+    # Step 2: try confirmed
+    if is_pruned:
+        if not blockhash:
+            return {
+                "error": f"Node is pruned above block {prune_height}. Please provide a blockhash parameter.",
+                "hint": f"GET /api/tx/{txid}?blockhash=<your_block_hash>"
+            }
+        try:
+            result = rpc("getrawtransaction", [txid, True, blockhash])
+            return {"source": "confirmed", "data": result}
+        except Exception as e:
+            error_code, error_message = e.args
+            print(f"[DEBUG] confirmed tx lookup failed: {error_message}")
+    else:
+        # full node
+        try:
+            result = rpc("getrawtransaction", [txid, True])
+            return {"source": "confirmed", "data": result}
+        except Exception as e:
+            error_code, error_message = e.args
+            print(f"[DEBUG] confirmed tx lookup failed: {error_message}")
+
+    # Step 3: nothing found
+    return {"error": "Transaction not found."}
+
 @app.get("/api/node/info")
 def get_node_info():
     data = rpc("getblockchaininfo")

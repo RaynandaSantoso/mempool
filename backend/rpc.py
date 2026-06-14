@@ -25,7 +25,11 @@ def rpc(method, params=None):
         "id": 1
     }
     data = requests.post(url, json=payload, auth=(user, password))
-    return data.json()["result"]
+    response = data.json()
+
+    if response["error"] != None:
+        raise Exception(response["error"]["code"], response["error"]["message"])
+    return response["result"]
 
 if __name__ == "__main__":
     print(rpc("getblockchaininfo"))
