@@ -17,11 +17,37 @@ def health():
 
 @app.get("/api/mempool")
 def get_mempool():
-    return rpc("getmempoolinfo")
+    try:
+        raw = rpc("getrawmempool", [True])
+        filtered = []
+        for txid, data in raw.items():
+            filtered.append({
+                "txid": txid,
+                "vsize": data["vsize"],
+                "fee": data["fees"]["base"],
+                "fee_rate": round(data["fees"]["base"] / data["vsize"] * 100_000_000, 2),
+                "time": data["time"]
+            })
+        return filtered[:100] 
+
+    except Exception as e:
+        error_code, error_message = e.args
+        return {"error": error_message}
 
 @app.get("/api/mempool/stats")
 def get_mempool_stats():
-    pass
+    try:
+        data = rpc("getmempoolinfo")
+        return {
+            "size": data["size"],
+            "bytes": data["bytes"],
+            "minfee": data["minfee"],
+            "mempoolminfee": data["mempoolminfee"]
+            }
+
+    except Exception as e:
+        error_code, error_message = e.args
+        return {"error": error_message}
 
 @app.get("/api/tx/{txid}")
 def get_transaction(txid: str, blockhash: str = None):
@@ -35,7 +61,7 @@ def get_transaction(txid: str, blockhash: str = None):
         return {"source": "mempool", "data": result}
     except Exception as e:
         error_code, error_message = e.args
-        # error code 5 means Transaction not in mempool
+        # error code -5 means Transaction not in mempool
         if error_code == -5: 
             print(f"[DEBUG] no transaction in mempool with the id {txid}")
         else:
@@ -96,11 +122,15 @@ def get_latest_blocks():
 @app.get("/api/block/{block_hash}")
 def get_block_data(block_hash):
     block_data = rpc("getblock", [block_hash])
-
-    return {
-        "height": block_data["height"], 
-        "time": block_data["time"], 
-        "nTx": block_data["nTx"], 
-        "size": block_data["size"], 
-        "difficulty": block_data["difficulty"]
-    }
+    try:
+        block_data = rpc("getblock", [block_hash])
+        return {
+            "height": block_data["height"], 
+            "time": block_data["time"], 
+            "nTx": block_data["nTx"], 
+            "size": block_data["size"], 
+            "difficulty": block_data["difficulty"]
+        }
+    except Exception as e:
+        error_code, error_message = e.args
+        return {"error": error_message}
