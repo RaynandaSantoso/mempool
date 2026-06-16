@@ -9,10 +9,10 @@ function NodeInfo() {
             .then(json => setData(json))
     }, []) 
 
-    if (data === null) return <p>Loading...</p>
+    if (data === null) return <p>Loading NodeInfo...</p>
     return (
         <div>
-            <p>chain: {data.chain}</p>
+            <p>Chain: {data.chain}</p>
             <p>Block Height: {data.blocks}</p>
             <p>Synced: {String(data.initialblockdownload === false)}</p>
         </div>
