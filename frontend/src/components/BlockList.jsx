@@ -11,13 +11,20 @@ function BlockList() {
 
     if (data === null) return <p>Loading Block List...</p>
     return (
-        <div>
-            {data.map(block => (
-                <div key={block.height}>
-                    <p>Height: {block.height}</p>
-                    <p>Hash: {block.hash}</p>
+        <div className="flex gap-4 overflow-x-auto">
+            {data.map(block => {
+                const minutesAgo = (Math.floor((Date.now() - block.time * 1000) / 60000))
+                return (
+                <div key={block.height} className="flex flex-col items-center flex-shrink-0">
+                    <p>{block.height}</p>
+                    <div className="bg-gray-500 rounded-lg p-4 w-32">
+                        <p>{block.nTx}</p>
+                        <p>transactions</p>
+                    </div>
+                    <p>{minutesAgo} minutes ago</p>
                 </div>
-            ))} 
+            )
+        })}
         </div>
     )
 }
