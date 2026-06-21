@@ -106,22 +106,30 @@ def get_node_info():
     }
     return node_info
 
+# TODO: handle partial block fetch failures
 @app.get("/api/blocks/latest")
 def get_latest_blocks():
-    current_height = rpc("getblockcount")
+    try:
+        current_height = rpc("getblockcount")
+        blocks = []
 
-    blocks = []
-
-    for num in range(10):
-        blocks.append({
-            "height": current_height - num,
-            "hash": rpc("getblockhash", [current_height - num])
-        })
-    return blocks
+        for num in range(50):
+            current_hash = rpc("getblockhash", [current_height - num])
+            block_data = rpc("getblock", [current_hash])
+            blocks.append({
+                "height": current_height - num,
+                "hash": current_hash,
+                "time": block_data["time"],
+                "nTx": block_data["nTx"],
+                "size": block_data["size"]
+            })
+        return blocks
+    except Exception as e:
+        error_code, error_message = e.args
+        return {"error": error_message}
 
 @app.get("/api/block/{block_hash}")
 def get_block_data(block_hash):
-    block_data = rpc("getblock", [block_hash])
     try:
         block_data = rpc("getblock", [block_hash])
         return {
