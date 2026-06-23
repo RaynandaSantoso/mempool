@@ -55,7 +55,7 @@ def get_transaction(txid: str, blockhash: str = None):
     is_pruned = node_info["pruned"]
     prune_height = node_info.get("pruneheight", None)
 
-    # Step 1: Check mempool
+    # Check mempool
     try:
         result = rpc("getmempoolentry", [txid])
         return {"source": "mempool", "data": result}
@@ -67,7 +67,7 @@ def get_transaction(txid: str, blockhash: str = None):
         else:
             return {"error": error_message}
 
-    # Step 2: try confirmed
+    # Try confirmed
     if is_pruned:
         if not blockhash:
             return {
@@ -81,7 +81,7 @@ def get_transaction(txid: str, blockhash: str = None):
             error_code, error_message = e.args
             print(f"[DEBUG] confirmed tx lookup failed: {error_message}")
     else:
-        # full node
+        # Full node
         try:
             result = rpc("getrawtransaction", [txid, True])
             return {"source": "confirmed", "data": result}
@@ -89,7 +89,7 @@ def get_transaction(txid: str, blockhash: str = None):
             error_code, error_message = e.args
             print(f"[DEBUG] confirmed tx lookup failed: {error_message}")
 
-    # Step 3: nothing found
+    # Nothing found
     return {"error": "Transaction not found."}
 
 @app.get("/api/node/info")
