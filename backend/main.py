@@ -121,7 +121,7 @@ def get_latest_blocks():
                 "hash": current_hash,
                 "time": block_data["time"],
                 "nTx": block_data["nTx"],
-                "size": block_data["size"]
+                "size": block_data["size"],
             })
         return blocks
     except Exception as e:
@@ -137,7 +137,8 @@ def get_block_data(block_hash):
             "time": block_data["time"], 
             "nTx": block_data["nTx"], 
             "size": block_data["size"], 
-            "difficulty": block_data["difficulty"]
+            "difficulty": block_data["difficulty"],
+            "tx": block_data["tx"]
         }
     except Exception as e:
         error_code, error_message = e.args
