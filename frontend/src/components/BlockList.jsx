@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import BlockDetailsView from './BlockDetailsView';
 
 function BlockList({ onSelectTx }) {
     const [data, setData] = useState(null)
     const [selectedBlock, setSelectedBlock] = useState(null);
+
+    const scrollRef = useRef(null);
+    const isDown = useRef(false);
+    const startX = useRef(0);
+    const startScrollLeft = useRef(0);
 
     useEffect(() => {
         fetch('/api/blocks/latest')
@@ -11,10 +16,36 @@ function BlockList({ onSelectTx }) {
             .then(json => setData(json))
     }, [])
 
+    const onMouseDown = (e) => {
+        isDown.current = true;
+        startX.current = e.pageX;
+        startScrollLeft.current = scrollRef.current.scrollLeft;
+        scrollRef.current.style.cursor = 'grabbing';
+    };
+
+    const onMouseUpOrLeave = () => {
+        isDown.current = false;
+        if (scrollRef.current) scrollRef.current.style.cursor = 'grab';
+    };
+
+    const onMouseMove = (e) => {
+        if (!isDown.current) return;
+        e.preventDefault();
+        const delta = e.pageX - startX.current;
+        scrollRef.current.scrollLeft = startScrollLeft.current - delta;
+    };
+
     if (data === null) return <p>Loading Block List...</p>
     return (
         <>
-            <div className="flex gap-3 overflow-x-auto pb-3">
+            <div
+                ref={scrollRef}
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMove}
+                onMouseUp={onMouseUpOrLeave}
+                onMouseLeave={onMouseUpOrLeave}
+                className="flex gap-3 overflow-x-auto pb-3 cursor-grab [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+            >
                 {data.map(block => {
                     const minutesAgo = (Math.floor((Date.now() - block.time * 1000) / 60000))
                     const isSelected = selectedBlock?.height === block.height
