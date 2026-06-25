@@ -1,20 +1,10 @@
-import { useState, useEffect } from 'react'
+function NodeInfo({ nodeInfo }) {
+    if (!nodeInfo) return <p>Loading node info...</p>
 
-function NodeInfo() {
-    const [data, setData] = useState(null)
-
-    useEffect(() => {
-        fetch('/api/node/info')
-            .then(res => res.json())
-            .then(json => setData(json))
-    }, []) 
-
-    if (data === null) return <p>Loading NodeInfo...</p>
     return (
         <div>
-            <p>Chain: {data.chain}</p>
-            <p>Block Height: {data.blocks}</p>
-            <p>Synced: {String(data.initialblockdownload === false)}</p>
+            <p>Chain: {nodeInfo.chain}</p>
+            <p>Pruned: {nodeInfo.pruned ? 'Yes' : 'No'}</p>
         </div>
     )
 }
