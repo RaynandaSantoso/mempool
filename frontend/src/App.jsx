@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import NodeInfo from './components/NodeInfo'
 import BlockList from './components/BlockList'
 import TransactionDetailView from './components/TransactionDetailView'
+import TabSwitcher from './components/TabSwitcher'
+import MempoolTab from './components/MempoolTab'
 import './App.css'
 
 function App() {
@@ -9,6 +11,7 @@ function App() {
     const [txidQuery, setTxidQuery] = useState('')
     const [blockHashQuery, setBlockHashQuery] = useState('')
     const [nodeInfo, setNodeInfo] = useState(null)
+    const [activeTab, setActiveTab] = useState('blocks')
 
     useEffect(() => {
         fetch('/api/node/info')
@@ -30,6 +33,7 @@ function App() {
             {/* Header */}
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold">Local Mempool</h1>
+                <TabSwitcher activeTab={activeTab} onChange={setActiveTab} />
                 <NodeInfo nodeInfo={nodeInfo} />
             </div>
 
@@ -59,8 +63,10 @@ function App() {
                     Search
                 </button>
             </div>
-
-            <BlockList onSelectTx={setSelectedTx} />
+            
+            {(activeTab === "blocks") ?
+                <BlockList onSelectTx={setSelectedTx} /> : <MempoolTab onSelectTx={setSelectedTx}/>
+            }
 
             {selectedTx && (
                 <TransactionDetailView
