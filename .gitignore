@@ -11,4 +11,5 @@ __pycache__/
 node_modules/
 
 # macOS junk
-.DS_Store
+.DS_StoreAGENTS.md
+CLAUDE.md
