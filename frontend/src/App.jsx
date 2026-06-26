@@ -38,13 +38,14 @@ function App() {
             </div>
 
             {/* Search Row */}
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-row gap-4 items-center">
                 <h2>Search Transaction</h2>
                 <input
                     type="text"
                     value={txidQuery}
                     onChange={e => setTxidQuery(e.target.value)}
-                    placeholder="Search by txid or block height..."
+                    placeholder="Search by txid or Block Height"
+                    className="bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 font-mono text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-orange-500 transition-colors w-80"
                 />
 
                 {isPruned && (
@@ -53,19 +54,27 @@ function App() {
                         value={blockHashQuery}
                         onChange={e => setBlockHashQuery(e.target.value)}
                         placeholder="BlockHash (pruned)"
+                        className="bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 font-mono text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-orange-500 transition-colors"
                     />
                 )}
 
                 <button
                     onClick={handleSearch}
-                    className="bg-orange-500 hover:bg-orange-400 text-white font-semibold px-4 py-2 rounded-md transition-colors"
+                    disabled={!txidQuery.trim()}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md font-semibold transition-colors ${txidQuery.trim()
+                        ? 'bg-orange-500 hover:bg-orange-400 text-white cursor-pointer'
+                        : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                        }`}
                 >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+                    </svg>
                     Search
                 </button>
             </div>
-            
+
             {(activeTab === "blocks") ?
-                <BlockList onSelectTx={setSelectedTx} /> : <MempoolTab onSelectTx={setSelectedTx}/>
+                <BlockList onSelectTx={setSelectedTx} /> : <MempoolTab onSelectTx={setSelectedTx} />
             }
 
             {selectedTx && (
