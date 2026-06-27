@@ -2,6 +2,11 @@
 A self-hosted Bitcoin block explorer connected directly to your own node (full/pruned). This project is inspired by mempool.space, and serve as a practice for building full-stack application: React frontend, FastAPI backend which talks to Bitcoin Core raw JSON-RPC.
 
 ## Screenshots
+<img width="1413" height="889" alt="Screenshot 2026-06-27 at 4 36 35 PM" src="https://github.com/user-attachments/assets/c0c11bb7-da9a-4170-9ac5-19db160986a1" />
+
+<img width="1333" height="874" alt="Screenshot 2026-06-27 at 4 36 52 PM" src="https://github.com/user-attachments/assets/1ec50aa7-ef43-4a01-abad-64a23c6ec872" />
+
+<img width="1357" height="855" alt="Screenshot 2026-06-27 at 4 36 43 PM" src="https://github.com/user-attachments/assets/e2afa350-d25e-4c3f-ada2-3ebc2d4ccaae" />
 
 ## Architecture
 ```
@@ -48,6 +53,7 @@ source .venv/bin/activate
 ```
 Backend:
 ```
+pip3 install -r backend/requirements.txt
 uvicorn backend.main:app --reload  
 ```
 
